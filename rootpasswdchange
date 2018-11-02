@@ -1,0 +1,26 @@
+cat change.sh
+#!/bin/bash
+
+#*************************************************************************
+# Script to change root password for every server.  To be
+# looped from Linux management server
+#
+#*************************************************************************
+
+PRE=/home/nherrman/mreyes/change_root
+
+INPUT=$PRE/merkle_servers.csv
+PASSWORD="newpassd"
+
+TXTOUT=$PRE/output/out`date +%Y%m%d%H%M`.txt
+
+#---------------------------------------------------
+# loop through all servers with standard root
+# change root password
+#---------------------------------------------------
+for SERVER in `cat $INPUT`
+do
+        sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no -o ConnectTimeout=3 $SERVER 'echo -e "oldpasswd" | (passwd --stdin root)'
+        echo "$?,$SERVER,`date`" >> $TXTOUT      ##log success or failure
+        echo "------------------------------------" >> $TXTOUT
+done
